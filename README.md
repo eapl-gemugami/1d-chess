@@ -6,7 +6,11 @@ Play as White against the CPU (Black).
 
 ## Run locally
 
-Open `chess.html` in a Web browser.
+Serve the directory over HTTP (for example, `python3 -m http.server 8000`) and open
+`http://localhost:8000/chess.html`. The weekly board is fetched from
+`https://eapl.me/1dchess/api/`; local browser requests require the API server to
+allow your local origin with CORS. Hosting the page on `https://eapl.me` instead
+uses a same-origin request and does not require CORS.
 
 ## Rules
 

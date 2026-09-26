@@ -27,6 +27,13 @@ canvas {
   margin-bottom: 0px;
 }
 
+#challenge-difficulty {
+  text-align: center;
+  color: #e6db74;
+  font-size: 20px;
+  margin: 8px 0;
+}
+
 #buttons {
 	display: flex;
 	justify-content: center;

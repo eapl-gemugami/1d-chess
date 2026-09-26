@@ -373,7 +373,7 @@ function isEndOfGame(pieceList, turn, threefoldRep) {
 	}
 }
 
-function drawEndScreen(gameResult) {
+function drawEndScreen(gameResult, nextChallengeDate) {
 	const backgroundColour = "rgba(0, 0, 0, 0.5)";
 	const textColor = "rgb(255, 255, 255)";
 
@@ -399,7 +399,23 @@ function drawEndScreen(gameResult) {
 			break;
 	}
 	message += " by " + gameResult["reason"] + "!";
-	ctx.fillText(message, 400, 50);
+	const showCountdown = gameResult["winner"] == "white" && gameResult["reason"] == "checkmate" && Number.isFinite(nextChallengeDate);
+	ctx.fillText(message, 400, showCountdown ? 38 : 50);
+	if (showCountdown) {
+		const timeRemaining = Math.max(0, nextChallengeDate - Date.now());
+		const minutesRemaining = Math.floor(timeRemaining / 60000);
+		let countdown = "Next challenge available now";
+		if (timeRemaining >= 86400000) {
+			const days = Math.ceil(timeRemaining / 86400000);
+			countdown = `Next challenge in ${days} day${days == 1 ? "" : "s"}`;
+		} else if (timeRemaining > 0) {
+			const hours = String(Math.floor(minutesRemaining / 60)).padStart(2, "0");
+			const minutes = String(minutesRemaining % 60).padStart(2, "0");
+			countdown = `Next challenge in ${hours}:${minutes} h`;
+		}
+		ctx.font = "20px Arial";
+		ctx.fillText(countdown, 400, 76);
+	}
 }
 
 // Keeps track of number of times every position has been seen.
@@ -459,7 +475,6 @@ function makeAIMove(gameState) {
 	gameState["gameResult"] = isEndOfGame(gameState["pieceList"], gameState["turn"], gameState["threefoldRep"]);
 	if (gameState["gameResult"]["winner"] != "none") {
 		// Game is over
-		drawEndScreen(gameState["gameResult"]);
 		return true;
 	}
 	// If the game is not over, check for claim draw-able position.
@@ -480,12 +495,23 @@ window.addEventListener('load', function () {
 	playAgainButton = $("#chess-replay");
 	claimDrawButton = $("#chess-draw");
 
-	let selectedTile, legalMoves, gameState;
+	let selectedTile, legalMoves, gameState, countdownInterval;
 	let gameEnded = false;
+	let initialBoardNotation;
+	let nextChallengeDate;
+	const difficultyDisplay = document.getElementById("challenge-difficulty");
+
+	function showEndScreen() {
+		drawEndScreen(gameState["gameResult"], nextChallengeDate)
+		if (gameState["gameResult"]["winner"] == "white" && gameState["gameResult"]["reason"] == "checkmate" && Number.isFinite(nextChallengeDate)) {
+			countdownInterval = setInterval(function () {
+				drawEndScreen(gameState["gameResult"], nextChallengeDate)
+			}, 60000)
+		}
+	}
 
 	initGame = function () {
-		const initialBoardNotation = boards.at(-1);
-
+		clearInterval(countdownInterval)
 		// Initialize gameState.
 		gameState = {
 			"turn": "white",
@@ -507,10 +533,30 @@ window.addEventListener('load', function () {
 		claimDrawButton.addClass("invisible")
 	}
 
-	initGame()
+	async function loadChallenge() {
+		playAgainButton.prop("disabled", true)
+		try {
+			const challenge = await fetchWeeklyChallenge()
+			initialBoardNotation = challenge.board
+			nextChallengeDate = Date.parse(challenge.next_challenge_date_utc)
+			const difficultyNames = ["Unknown", "Easy", "Medium", "Hard"]
+			difficultyDisplay.textContent = "Difficulty: " + "★".repeat(challenge.difficulty) + "☆".repeat(3 - challenge.difficulty)
+			difficultyDisplay.setAttribute("aria-label", difficultyNames[challenge.difficulty] + " difficulty")
+			initGame()
+		} catch (error) {
+			console.error("Could not load weekly challenge", error)
+			difficultyDisplay.textContent = "Challenge unavailable. Restart Game to retry."
+			difficultyDisplay.removeAttribute("aria-label")
+		} finally {
+			playAgainButton.prop("disabled", false)
+		}
+	}
+
+	loadChallenge()
 
 	// 'mousedown on board' event handler.
 	$("#chess-canvas").mousedown(function (e) {
+		if (!gameState) return
 
 		if (gameState["gameResult"]["winner"] != "none") {
 			// Don't allow any input if the game is over,
@@ -561,20 +607,20 @@ window.addEventListener('load', function () {
 				gameState["gameResult"] = isEndOfGame(gameState["pieceList"], gameState["turn"], gameState["threefoldRep"]);
 				if (gameState["gameResult"]["winner"] != "none") {
 					// Game is over !
-					drawEndScreen(gameState["gameResult"])
+					showEndScreen()
 					gameEnded = true
 					return
 				}
 
 				setTimeout(function () {
 					gameEnded = makeAIMove(gameState);
+					if (gameEnded) showEndScreen()
 				}, 1000)
 
 				// If the game is not over, check for claim draw-able position.
 				if (canClaimDraw(gameState["pieceList"])) {
 					claimDrawButton.removeClass("invisible")
 				}
-
 			}
 
 			// Unselect the piece.
@@ -585,8 +631,12 @@ window.addEventListener('load', function () {
 	});
 
 	playAgainButton.click(function () {
-		// Reset game
-		initGame()
+		// Reset game.
+		if (initialBoardNotation) {
+			initGame()
+		} else {
+			loadChallenge()
+		}
 	});
 
 	claimDrawButton.click(function () {
@@ -595,7 +645,7 @@ window.addEventListener('load', function () {
 				"winner": "draw",
 				"reason": "agreement"
 			};
-			drawEndScreen(gameState["gameResult"])
+			showEndScreen()
 			gameEnded = true
 		}
 	})

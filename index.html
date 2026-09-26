@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="./css/styles.css">
 	<script src="./js/jquery-3.6.0.min.js"></script>
 	<script src="./js/roundRect.js"></script>
-	<script src="./js/boards.js"></script>
+	<script src="./js/weekly-challenge.js"></script>
 	<script src="./js/1d-chess.js"></script>
 	<script src="./js/chess-ai.js"></script>
 
@@ -47,10 +47,11 @@
 
 	<div id="chess-container">
 		<canvas id="chess-canvas" width="800" height="100"></canvas>
+		<div id="challenge-difficulty" role="status" aria-live="polite">Loading challenge...</div>
 		<div id="buttons">
-			<button id="chess-draw" class="invisible" type="button" title="Neither player can checkmate!"> Claim Draw
+			<button id="chess-draw" class="invisible" type="button" title="Neither player can checkmate!">Claim Draw
 			</button>
-			<button id="chess-replay" type="button"> Restart Game</button>
+			<button id="chess-replay" type="button">Restart Game</button>
 		</div>
 	</div>
 
