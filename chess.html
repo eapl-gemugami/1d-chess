@@ -1,18 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<!-- Google tag (gtag.js) -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=G-M03GCRBYV1"></script>
-	<script>
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
 
-	gtag('config', 'G-M03GCRBYV1');
-	</script>
-	
-    <meta charset="utf-8" />
-    <title>1D-Chess</title>
+<head>
+	<meta charset="utf-8" />
+	<title>1D-Chess</title>
 
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	<link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
@@ -33,22 +24,22 @@
 </head>
 
 <div class="pieces-images" hidden>
-	<img id="white-king" src="./assets/pieces/white-king.svg"/>
-	<img id="white-knight" src="./assets/pieces/white-knight.svg"/>
-	<img id="white-rook" src="./assets/pieces/white-rook.svg"/>
-	
-	<img id="black-king" src="./assets/pieces/black-king.svg"/>
-	<img id="black-knight" src="./assets/pieces/black-knight.svg"/>
-	<img id="black-rook" src="./assets/pieces/black-rook.svg"/>
+	<img id="white-king" src="./assets/pieces/white-king.svg" />
+	<img id="white-knight" src="./assets/pieces/white-knight.svg" />
+	<img id="white-rook" src="./assets/pieces/white-rook.svg" />
+
+	<img id="black-king" src="./assets/pieces/black-king.svg" />
+	<img id="black-knight" src="./assets/pieces/black-knight.svg" />
+	<img id="black-rook" src="./assets/pieces/black-rook.svg" />
 </div>
 
-<header> 
-    <div class="site-title">
-		1D-Chess
+<header>
+	<div class="site-title">
+		Weekly 1D-Chess
 		<div class="site-subtitle">
-			By: Rowan Monk
+			Based on <a href="https://rowan441.github.io/1dchess/chess.html">1D-Chess by: Rowan Monk</a>
 		</div>
-    </div>  
+	</div>
 </header>
 
 <body>
@@ -56,64 +47,66 @@
 	<div id="chess-container">
 		<canvas id="chess-canvas" width="800" height="100"></canvas>
 		<div id="buttons">
-			<button id="chess-draw" class="invisible" type="button" title="Neither player can checkmate!"> Claim Draw </button>
+			<button id="chess-draw" class="invisible" type="button" title="Neither player can checkmate!"> Claim Draw
+			</button>
 			<button id="chess-replay" type="button"> Restart Game</button>
 		</div>
 	</div>
 
 	<main>
-
-		<h1> 1D-Chess </h1>
-
-		<p> 
-			1d-chess is a new variant where you can play the beautiful game without all those unneccessary and complicated extra dimensions.
-			Play as white against the AI. You might initally find it more difficult than expected, but assming optimal play, is there a forced win for white?
-			<br>
-			<br>
-			Mouse over to reveal answer: <span class="spoiler-box">Try this line: N4 N5, N6 K7, R4 K6, R2 K7, R5++</span>
-		</p>
-
-		<h2> Rules </h2>
-		
-		<p> There are three pieces in 1d-chess: </p>
-
-		<h3 class="piecerules"> King: </h3>
-
-		<p class="moverules">  Can move one square in any direction. </p>
-
-		<h3 class="piecerules"> Knight: </h3>
-
-		<p class="moverules">  Can move 2 squares forward or backward. (jumping over any pieces in the way) </p>
-
-		<h3 class="piecerules"> Rook: </h3>
-
-		<p class="moverules">  Can move in a straight line in any direction. </p>
-
+		<h1>1D-Chess</h1>
 		<p>
-			Win by checkmating the enemy king. This occurs when the enemy king is in check (under attack by one of your pieces) 
-			and there are no legal moves for the opponent to get their king out of check.
+			1D-chess is a variant where you play the beautiful game
+			without all those unneccessary and complicated extra dimensions.
+			Every week you'll find a new challenge.
 		</p>
 
-		<p>
-			Careful! A draw can occur if:
-		</p>
+		<details>
+			<h2>Rules</h2>
+			<p>There are three pieces in 1D-chess: </p>
 
-		<ul>
-			<li> A player is <strong>not</strong> in check and there are no legal moves for them to play <span class="purple">(Stalemate)</span> </li>
-			<li> The same board position is repeated 3 times in a game. <span class="purple">(3 Fold Repetition)</span> </li>
-			<li> There are only kings left on the board, thus it is impossible to checkmate the opponent <span class="purple">(Insufficient Material)</span> </li>
-		</ul>
+			<h3 class="piecerules">King ♔: </h3>
+			<p class="moverules">Can move 1 square in any direction.</p>
 
-		<h2> Credits </h2>
-			
-		<p>
-			This chess variant was first described by <strong>Martin Gardner</strong> in the Mathematical Games column of the July 1980 issue of <i>Scientific American</i>
-			<br>
-			See <a href="https://www.jstor.org/stable/24966361">The column on JSTOR</a>
-		</p>
+			<h3 class="piecerules">Knight ♘: </h3>
+			<p class="moverules">Can move 2 squares forward or backward, jumping over any pieces in the way.</p>
 
-		
+			<h3 class="piecerules">Rook ♖: </h3>
+			<p class="moverules">Can move any amount of spaces in a straight line in any direction.</p>
+
+			<p>
+				Win by checkmating the enemy king. This occurs when the enemy king
+				is in check (under attack by one of your pieces)
+				and there are no legal moves for the opponent to get
+				their king out of check.
+			</p>
+
+			<p>
+				Careful! A draw can occur if:
+			</p>
+
+			<ul>
+				<li> A player is <strong>not</strong> in check and there are no legal moves for them to play <span
+						class="purple">(Stalemate)</span> </li>
+				<li> The same board position is repeated 3 times in a game. <span class="purple">(3 Fold
+						Repetition)</span>
+				</li>
+				<li> There are only kings left on the board, thus it is impossible to checkmate the opponent <span
+						class="purple">(Insufficient Material)</span> </li>
+			</ul>
+
+			<h2>Credits</h2>
+			<p>
+				Base implementation by <a href="https://rowan441.github.io/rowan/rowan.html">Rowan Monk</a> in <a
+					href="https://rowan441.github.io/1dchess/chess.html">1D-Chess</a>
+				This chess variant was first described by <strong>Martin Gardner</strong> in the Mathematical Games
+				column
+				of the July 1980 issue of <i>Scientific American</i>
+				<br>
+				See <a href="https://www.jstor.org/stable/24966361">The column on JSTOR</a>
+			</p>
+		</details>
 	</main>
-	
 </body>
+
 </html>

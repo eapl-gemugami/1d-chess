@@ -1,25 +1,23 @@
-// Global vars.
-let canvas, ctx, pieces, sounds;
+// Set up global vars.
+let canvas, ctx, pieces, sounds
 
-// Loads sounds then adds them to 'sounds' object
+// Loads sounds then adds them to 'sounds' object.
 function getSFXs() {
-
 	sounds = {}
 
 	let audioElement = new Audio('./assets/audio/chess-move.mp3');
 	audioElement.addEventListener("canplaythrough", function () {
 		sounds["chess-move"] = audioElement;
-	}, true);
+	}, true)
 
-	audioElement2 = new Audio('./assets/audio/chess-capture.mp3');
+	let audioElement2 = new Audio('./assets/audio/chess-capture.mp3');
 	audioElement2.addEventListener("canplaythrough", function () {
 		sounds["chess-capture"] = audioElement2;
-	}, true);
+	}, true)
 
 }
 
 function getImagesfromDom() {
-
 	let pieces = {
 		"white-king": $("#white-king").get(0),
 		"white-knight": $("#white-knight").get(0),
@@ -30,7 +28,6 @@ function getImagesfromDom() {
 	}
 
 	return pieces
-
 }
 
 function drawBoard(ctx, pieceList, tileSelected, legalMoves) {
@@ -586,7 +583,7 @@ window.addEventListener('load', function () {
 	});
 
 	playAgainButton.click(function () {
-		//reset game
+		// Reset game
 		initGame();
 	});
 
@@ -600,6 +597,4 @@ window.addEventListener('load', function () {
 			gameEnded = true;
 		}
 	});
-
-
 });
