@@ -4,13 +4,16 @@ An implementation of 1D chess, a chess variant played on a single row of eight s
 
 Play as White against the CPU (Black).
 
+The weekly board is fetched from
+`https://eapl.me/1dchess/api/`; local browser requests require the API server to
+allow your local origin with CORS.
+
+To overcome the CORS issue, this project is being hosted on `https://eapl.me/1dchess/`.
+
 ## Run locally
 
 Serve the directory over HTTP (for example, `python3 -m http.server 8000`) and open
-`http://localhost:8000/chess.html`. The weekly board is fetched from
-`https://eapl.me/1dchess/api/`; local browser requests require the API server to
-allow your local origin with CORS. Hosting the page on `https://eapl.me` instead
-uses a same-origin request and does not require CORS.
+`http://localhost:8000`.
 
 ## Rules
 
