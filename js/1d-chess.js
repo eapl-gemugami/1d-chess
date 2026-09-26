@@ -1,88 +1,102 @@
 // Set up global vars.
 let canvas, ctx, pieces, sounds
 
+// Piece type identifiers (matches the part after "white-"/"black-" in pieceList entries).
+const KING = "king"
+const KNIGHT = "knight"
+const ROOK = "rook"
+
+// Full piece identifiers (matches pieceList entries and DOM element ids).
+const WHITE_KING = "white-king"
+const WHITE_KNIGHT = "white-knight"
+const WHITE_ROOK = "white-rook"
+const BLACK_KING = "black-king"
+const BLACK_KNIGHT = "black-knight"
+const BLACK_ROOK = "black-rook"
+
 // Loads sounds then adds them to 'sounds' object.
 function getSFXs() {
 	sounds = {}
 
-	let audioElement = new Audio('./assets/audio/chess-move.mp3');
+	let audioElement = new Audio('./assets/audio/chess-move.mp3')
 	audioElement.addEventListener("canplaythrough", function () {
-		sounds["chess-move"] = audioElement;
+		sounds["chess-move"] = audioElement
 	}, true)
 
-	let audioElement2 = new Audio('./assets/audio/chess-capture.mp3');
+	let audioElement2 = new Audio('./assets/audio/chess-capture.mp3')
 	audioElement2.addEventListener("canplaythrough", function () {
-		sounds["chess-capture"] = audioElement2;
+		sounds["chess-capture"] = audioElement2
 	}, true)
 
 }
 
 function getImagesfromDom() {
 	let pieces = {
-		"white-king": $("#white-king").get(0),
-		"white-knight": $("#white-knight").get(0),
-		"white-rook": $("#white-rook").get(0),
-		"black-king": $("#black-king").get(0),
-		"black-knight": $("#black-knight").get(0),
-		"black-rook": $("#black-rook").get(0),
+		[WHITE_KING]: $("#white-king").get(0),
+		[WHITE_KNIGHT]: $("#white-knight").get(0),
+		[WHITE_ROOK]: $("#white-rook").get(0),
+		[BLACK_KING]: $("#black-king").get(0),
+		[BLACK_KNIGHT]: $("#black-knight").get(0),
+		[BLACK_ROOK]: $("#black-rook").get(0),
 	}
 
 	return pieces
 }
 
 function drawBoard(ctx, pieceList, tileSelected, legalMoves) {
-	const darkTileColor = "#b58863";
-	const lightTileColor = "#f0d9b5 ";
-	const highlightColor = "rgba(10, 255, 10, 0.15)";
-	const checkColor = "rgba(255, 0, 0, 0.4)";
-	const indicatorColor = "rgba(0, 0, 0, 0.25)";
-	const pieceScale = 100;
+	const darkTileColor = "#b58863"
+	const lightTileColor = "#f0d9b5"
+	const highlightColor = "rgba(10, 255, 10, 0.15)"
+	const checkColor = "rgba(255, 0, 0, 0.4)"
+	const indicatorColor = "rgba(0, 0, 0, 0.25)"
+	const pieceScale = 100
 
-	// draw: board
-	ctx.fillStyle = darkTileColor;
-	ctx.fillRect(0, 0, 100, 100);
-	ctx.fillRect(200, 0, 100, 100);
-	ctx.fillRect(400, 0, 100, 100);
-	ctx.fillRect(600, 0, 100, 100);
+	// Draw: board
+	ctx.fillStyle = darkTileColor
+	ctx.fillRect(0, 0, 100, 100)
+	ctx.fillRect(200, 0, 100, 100)
+	ctx.fillRect(400, 0, 100, 100)
+	ctx.fillRect(600, 0, 100, 100)
 
-	ctx.fillStyle = lightTileColor;
-	ctx.fillRect(100, 0, 100, 100);
-	ctx.fillRect(300, 0, 100, 100);
-	ctx.fillRect(500, 0, 100, 100);
-	ctx.fillRect(700, 0, 100, 100);
+	ctx.fillStyle = lightTileColor
+	ctx.fillRect(100, 0, 100, 100)
+	ctx.fillRect(300, 0, 100, 100)
+	ctx.fillRect(500, 0, 100, 100)
+	ctx.fillRect(700, 0, 100, 100)
 
-	// draw: highlighted tile
+	// Draw: highlighted tile
 	if (tileSelected != -1) {
-		ctx.fillStyle = highlightColor;
-		ctx.fillRect(tileSelected * 100, 0, 100, 100);
+		ctx.fillStyle = highlightColor
+		ctx.fillRect(tileSelected * 100, 0, 100, 100)
 	}
 
-	// draw: king in check tiles
+	// Draw: king in check tiles
 	let kingPos = checkedKing(pieceList, "white");
 	if (kingPos != "none") {
-		ctx.fillStyle = checkColor;
-		ctx.fillRect(kingPos * 100, 0, 100, 100);
+		ctx.fillStyle = checkColor
+		ctx.fillRect(kingPos * 100, 0, 100, 100)
 	}
-	kingPos = checkedKing(pieceList, "black");
+
+	kingPos = checkedKing(pieceList, "black")
 	if (kingPos != "none") {
-		ctx.fillStyle = checkColor;
-		ctx.fillRect(kingPos * 100, 0, 100, 100);
+		ctx.fillStyle = checkColor
+		ctx.fillRect(kingPos * 100, 0, 100, 100)
 	}
 
-	console.log(pieces);
+	console.log(pieces)
 
-	// draw: pieces
+	// Draw: pieces
 	for (let i = 0; i < pieceList.length; i++) {
 		if (pieceList[i] != "Empty") {
-			ctx.drawImage(pieces[pieceList[i]], i * 100, 0, pieceScale, pieceScale);
+			ctx.drawImage(pieces[pieceList[i]], i * 100, 0, pieceScale, pieceScale)
 		}
 	}
 
-	// draw: legal move indicators
+	// Draw: legal move indicators
 	if (legalMoves) {
 		for (let i = 0; i < legalMoves.length; i++) {
-			ctx.strokeStyle = indicatorColor;
-			ctx.fillStyle = indicatorColor;
+			ctx.strokeStyle = indicatorColor
+			ctx.fillStyle = indicatorColor
 			ctx.beginPath();
 			if (pieceList[legalMoves[i]] == "Empty") {
 				// draw circle
@@ -97,9 +111,9 @@ function drawBoard(ctx, pieceList, tileSelected, legalMoves) {
 	}
 }
 
-//from: https://stackoverflow.com/a/5417934
+// From: https://stackoverflow.com/a/5417934
 function getCursorPosition(e) {
-	let x, y;
+	let x, y
 
 	canoffset = canvas.offset();
 	x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - Math.floor(canoffset.left);
@@ -108,43 +122,42 @@ function getCursorPosition(e) {
 	return [x, y];
 }
 
-// Returns the index of the chess tile that was clicked on thefrom click event 'e'
+// Returns the index of the chess tile that was clicked on the from click event 'e'
 function getTileFromClick(e) {
 	return Math.floor(getCursorPosition(e)[0] / 100);
 }
 
 // Returns all the possible moves for the piece at 'startPos'
 // (assumes piece at 'startPos' has color: 'turn')
-// DOESNT check if king is in check
-function getPossbleMoves(startPos, pieceList, turn) {
-
+// DOESN'T check if king is in check
+function getPossibleMoves(startPos, pieceList, turn) {
 	function potentialMove(x) {
-		return 0 <= x && x <= 7 && !pieceList[x].includes(turn);
+		return 0 <= x && x <= 7 && !pieceList[x].includes(turn)
 	}
 
-	let possibleMoves = []; // moves allow by rules of piece
+	let possibleMoves = [] // Moves allowed by rules of piece
 
-	let pieceType = pieceList[startPos].split("-")[1];
+	let pieceType = pieceList[startPos].split("-")[1]
 	switch (pieceType) {
-		case "king":
+		case KING:
 			if (potentialMove(startPos + 1)) {
-				possibleMoves.push(startPos + 1);
+				possibleMoves.push(startPos + 1)
 			}
 			if (potentialMove(startPos - 1)) {
-				possibleMoves.push(startPos - 1);
+				possibleMoves.push(startPos - 1)
 			}
 			break;
-		case "knight":
+		case KNIGHT:
 			if (potentialMove(startPos + 2)) {
-				possibleMoves.push(startPos + 2);
+				possibleMoves.push(startPos + 2)
 			}
 			if (potentialMove(startPos - 2)) {
-				possibleMoves.push(startPos - 2);
+				possibleMoves.push(startPos - 2)
 			}
 			break;
-		case "rook":
-			//TODO: clean this up
-			// leftwards moves:
+		case ROOK:
+			// TODO: clean this up -> Update: 2026-09-26
+			// Leftwards moves:
 			if (startPos !== 0) { // Check if rook is on left edge of board
 				for (let i = startPos - 1; i >= 0; i--) {
 					if (pieceList[i] != "Empty") {
@@ -186,7 +199,7 @@ function getPossbleMoves(startPos, pieceList, turn) {
 // Checks if king is in check
 function getLegalMoves(startPos, pieceList, turn) {
 
-	let possibleMoves = getPossbleMoves(startPos, pieceList, turn);
+	let possibleMoves = getPossibleMoves(startPos, pieceList, turn);
 	let legalMoves = []; //moves allowed by rules of piece AND doesn't put king in check
 
 	// check if king now in check
@@ -221,12 +234,12 @@ function otherColor(color) {
 
 function boardNotationToPieceList(boardNotation) {
 	const pieceMap = {
-		"K": "white-king",
-		"N": "white-knight",
-		"R": "white-rook",
-		"k": "black-king",
-		"n": "black-knight",
-		"r": "black-rook",
+		"K": WHITE_KING,
+		"N": WHITE_KNIGHT,
+		"R": WHITE_ROOK,
+		"k": BLACK_KING,
+		"n": BLACK_KNIGHT,
+		"r": BLACK_ROOK,
 		".": "Empty"
 	};
 
@@ -237,12 +250,12 @@ function boardNotationToPieceList(boardNotation) {
 
 function pieceListToBoardNotation(pieceList) {
 	const pieceMap = {
-		"white-king": "K",
-		"white-knight": "N",
-		"white-rook": "R",
-		"black-king": "k",
-		"black-knight": "n",
-		"black-rook": "r",
+		[WHITE_KING]: "K",
+		[WHITE_KNIGHT]: "N",
+		[WHITE_ROOK]: "R",
+		[BLACK_KING]: "k",
+		[BLACK_KNIGHT]: "n",
+		[BLACK_ROOK]: "r",
 		"Empty": "."
 	};
 
@@ -265,7 +278,7 @@ function checkedKing(pieceList, turn) {
 
 	for (let i = 0; i < pieceList.length; i++) {
 		if (pieceList[i].includes(otherColor(turn))) {
-			let possibleMoves = getPossbleMoves(i, pieceList, otherColor(turn));
+			let possibleMoves = getPossibleMoves(i, pieceList, otherColor(turn));
 			if (possibleMoves.includes(kingPos)) {
 				return kingPos;
 			}
@@ -291,7 +304,7 @@ function inCheck(pieceList, turn) {
 
 	for (let i = 0; i < pieceList.length; i++) {
 		if (pieceList[i].includes(otherColor(turn))) {
-			let possibleMoves = getPossbleMoves(i, pieceList, otherColor(turn));
+			let possibleMoves = getPossibleMoves(i, pieceList, otherColor(turn));
 			if (possibleMoves.includes(kingPos)) {
 				return true;
 			}
@@ -319,7 +332,7 @@ function isEndOfGame(pieceList, turn, threefoldRep) {
 
 	let onlyKingsLeft = true;
 	for (let i = 0; i < pieceList.length; i++) {
-		if (pieceList[i].includes("knight") || pieceList[i].includes("rook")) {
+		if (pieceList[i].includes(KNIGHT) || pieceList[i].includes(ROOK)) {
 			onlyKingsLeft = false;
 			break;
 		}
@@ -358,20 +371,17 @@ function isEndOfGame(pieceList, turn, threefoldRep) {
 			"reason": "stalemate"
 		};
 	}
-
-
-
 }
 
 function drawEndScreen(gameResult) {
 	const backgroundColour = "rgba(0, 0, 0, 0.5)";
 	const textColor = "rgb(255, 255, 255)";
 
-	// draw: background
+	// Draw: background
 	ctx.fillStyle = backgroundColour;
 	ctx.fillRect(0, 0, 800, 100);
 
-	// draw: win text
+	// Draw: win text
 	ctx.fillStyle = textColor;
 	ctx.textAlign = "center";
 	ctx.font = "40px Arial";
@@ -390,10 +400,9 @@ function drawEndScreen(gameResult) {
 	}
 	message += " by " + gameResult["reason"] + "!";
 	ctx.fillText(message, 400, 50);
-
 }
 
-// Keeps track of number of times every position has been seen
+// Keeps track of number of times every position has been seen.
 function recordPosition(pieceList, positionsSeen, threefoldRep) {
 	let hash = pieceListToBoardNotation(pieceList);
 	if (Object.keys(positionsSeen).includes(hash)) {
@@ -429,6 +438,7 @@ function makeAIMove(gameState) {
 	if (gameState["pieceList"][endPos] != "Empty") {
 		capturingMove = true;
 	}
+
 	makeMove(startPos, endPos, gameState["pieceList"]);
 	gameState["threefoldRep"] = recordPosition(gameState["pieceList"], gameState["positionsSeen"], gameState["threefoldRep"]);
 	drawBoard(ctx, gameState["pieceList"], startPos);
@@ -442,23 +452,22 @@ function makeAIMove(gameState) {
 		}
 	}
 
-	// END OF TURN
+	// END OF TURN.
 	gameState["turn"] = otherColor(gameState["turn"])
 
-	// Check for winner/loser/draw
+	// Check for winner/loser/draw.
 	gameState["gameResult"] = isEndOfGame(gameState["pieceList"], gameState["turn"], gameState["threefoldRep"]);
 	if (gameState["gameResult"]["winner"] != "none") {
 		// Game is over
 		drawEndScreen(gameState["gameResult"]);
 		return true;
 	}
-	//If the game is not over, check for claim draw-able position
+	// If the game is not over, check for claim draw-able position.
 	if (canClaimDraw(gameState["pieceList"])) {
 		claimDrawButton.removeClass("invisible");
 	}
 
 	return false;
-
 }
 
 window.addEventListener('load', function () {
@@ -475,19 +484,9 @@ window.addEventListener('load', function () {
 	let gameEnded = false;
 
 	initGame = function () {
-		const positions = [
-			'K.R.rNkn', // 1
-			'KnkN..Rr', // 2
-			'K..NkrRn', // 3
-			'nKR..Nkr', // 4
-			'KR.n.Nkr', // 5
-			'KR.rNkn.', // 6
-			'KnRN.rk.', // 7
-		]
-		// ES-2022 syntax
-		const initialBoardNotation = positions.at(-1);
+		const initialBoardNotation = boards.at(-1);
 
-		// Initialize gameState
+		// Initialize gameState.
 		gameState = {
 			"turn": "white",
 			"gameResult": { "winner": "none" },
@@ -496,95 +495,98 @@ window.addEventListener('load', function () {
 			"threefoldRep": false
 		}
 
-		// Init vars
-		selectedTile = -1;
-		legalMoves = [];
+		// Init vars.
+		selectedTile = -1
+		legalMoves = []
 
-		// Draw starting board
-		drawBoard(ctx, gameState["pieceList"], selectedTile);
+		// Draw starting board.
+		drawBoard(ctx, gameState["pieceList"], selectedTile)
 
-		gameEnded = false;
+		gameEnded = false
 
-		claimDrawButton.addClass("invisible");
-	};
+		claimDrawButton.addClass("invisible")
+	}
 
-	initGame();
+	initGame()
 
-	// 'mouesdown on board' event handler
+	// 'mousedown on board' event handler.
 	$("#chess-canvas").mousedown(function (e) {
 
 		if (gameState["gameResult"]["winner"] != "none") {
-			//Don't allow any input if the game is over
-			return;
+			// Don't allow any input if the game is over,
+			return
 		}
 
 		if (gameState["turn"] == "black") {
-			//Don't allow any input if it's not the player's turn
-			return;
+			// Don't allow any input if it's not the player's turn.
+			return
 		}
 
 		let tileClicked = getTileFromClick(e);
 
 		if (selectedTile == -1) { // No Selection:
 			if (gameState["pieceList"][tileClicked].includes(gameState["turn"])) {
-				selectedTile = tileClicked;
-				legalMoves = getLegalMoves(selectedTile, gameState["pieceList"], gameState["turn"]);
-				drawBoard(ctx, gameState["pieceList"], selectedTile, legalMoves);
+				selectedTile = tileClicked
+				legalMoves = getLegalMoves(selectedTile, gameState["pieceList"], gameState["turn"])
+
+				drawBoard(ctx, gameState["pieceList"], selectedTile, legalMoves)
 			}
 		} else { // Piece Selected:
 			if (legalMoves.includes(tileClicked)) {
-				// Make move
+				// Make move.
 				let capturingMove = false;
 				if (gameState["pieceList"][tileClicked] != "Empty") {
 					capturingMove = true;
 				}
-				makeMove(selectedTile, tileClicked, gameState["pieceList"]);
-				gameState["threefoldRep"] = recordPosition(gameState["pieceList"], gameState["positionsSeen"], gameState["threefoldRep"]);
-				selectedTile = -1;
-				drawBoard(ctx, gameState["pieceList"], selectedTile);
+
+				makeMove(selectedTile, tileClicked, gameState["pieceList"])
+				gameState["threefoldRep"] = recordPosition(gameState["pieceList"], gameState["positionsSeen"], gameState["threefoldRep"])
+				selectedTile = -1
+				drawBoard(ctx, gameState["pieceList"], selectedTile)
+
 				if (capturingMove) {
-					if (sounds["chess-capture"]) { //Play sound
-						sounds["chess-capture"].play();
+					if (sounds["chess-capture"]) { // Play capture sound
+						sounds["chess-capture"].play()
 					}
 				} else {
-					if (sounds["chess-move"]) { //Play sound
-						sounds["chess-move"].play();
+					if (sounds["chess-move"]) { // Play move sound
+						sounds["chess-move"].play()
 					}
 				}
 
-
-				// END OF TURN
+				// END OF TURN !
 				gameState["turn"] = otherColor(gameState["turn"])
 
-				// Check for winner/loser/draw
+				// Check for winner/loser/draw.
 				gameState["gameResult"] = isEndOfGame(gameState["pieceList"], gameState["turn"], gameState["threefoldRep"]);
 				if (gameState["gameResult"]["winner"] != "none") {
-					// Game is over
-					drawEndScreen(gameState["gameResult"]);
-					gameEnded = true;
-					return;
+					// Game is over !
+					drawEndScreen(gameState["gameResult"])
+					gameEnded = true
+					return
 				}
 
 				setTimeout(function () {
 					gameEnded = makeAIMove(gameState);
-				}, 1000);
+				}, 1000)
 
-				//If the game is not over, check for claim draw-able position
+				// If the game is not over, check for claim draw-able position.
 				if (canClaimDraw(gameState["pieceList"])) {
-					claimDrawButton.removeClass("invisible");
+					claimDrawButton.removeClass("invisible")
 				}
 
 			}
-			// unselect the piece
-			legalMoves = [];
-			selectedTile = -1;
-			drawBoard(ctx, gameState["pieceList"], selectedTile, legalMoves);
+
+			// Unselect the piece.
+			legalMoves = []
+			selectedTile = -1
+			drawBoard(ctx, gameState["pieceList"], selectedTile, legalMoves)
 		}
 	});
 
 	playAgainButton.click(function () {
 		// Reset game
-		initGame();
+		initGame()
 	});
 
 	claimDrawButton.click(function () {
@@ -593,8 +595,8 @@ window.addEventListener('load', function () {
 				"winner": "draw",
 				"reason": "agreement"
 			};
-			drawEndScreen(gameState["gameResult"]);
-			gameEnded = true;
+			drawEndScreen(gameState["gameResult"])
+			gameEnded = true
 		}
-	});
-});
+	})
+})
